@@ -34,6 +34,10 @@ class CommaSeparatedUserField(forms.Field):
         if isinstance(value, (list, tuple)):
             return value
         
+        #test if last char is a seperator, some tokenizers are not that smart
+        if value[-1] == ',':
+            value = value[0:-1]
+            
         names = set(value.split(','))
         names_set = set([name.strip() for name in names])
         users = list(User.objects.filter(username__in=names_set))
