@@ -1,4 +1,4 @@
-from django_messages.models import inbox_count_for
+from threaded_messages.models import inbox_count_for
 
 def inbox(request):
     if request.user.is_authenticated():

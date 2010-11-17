@@ -1,5 +1,5 @@
 from django.template import Library, Node, TemplateSyntaxError
-from django_messages.models import inbox_count_for
+from threaded_messages.models import inbox_count_for
 
 class InboxOutput(Node):
     def __init__(self, varname=None):

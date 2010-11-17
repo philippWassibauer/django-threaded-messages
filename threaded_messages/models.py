@@ -93,8 +93,6 @@ class Participant(models.Model):
     replied_at = models.DateTimeField(_("replied at"), null=True, blank=True)
     deleted_at = models.DateTimeField(_("deleted at"), null=True, blank=True)
     
-    sender_profile = models.ForeignKey(Profile, blank=True, null=True)
-    
     objects = MessageManager()
     
     def new(self):
@@ -104,7 +102,7 @@ class Participant(models.Model):
         return True
 
     def replied(self):
-        """returns whether the recipient has read the message or not"""
+        """returns whether the recipient has replied the message or not"""
         if self.replied_at is not None:
             return False
         return True
@@ -130,5 +128,5 @@ def inbox_count_for(user):
     return Participant.objects.filter(user=user, read_at__isnull=True, deleted_at__isnull=True).count()
 
 
-from django_messages.utils import new_message_email
+from threaded_messages.utils import new_message_email
 signals.post_save.connect(new_message_email, sender=Message)

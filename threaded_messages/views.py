@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import datetime
 
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -11,8 +11,8 @@ from django.utils.translation import ugettext_noop
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from django_messages.models import *
-from django_messages.forms import ComposeForm, ReplyForm
+from threaded_messages.models import *
+from threaded_messages.forms import ComposeForm, ReplyForm
 
 
 @login_required
@@ -23,8 +23,19 @@ def inbox(request, template_name='django_messages/inbox.html'):
         ``template_name``: name of the template to use.
     """
     thread_list = Participant.objects.inbox_for(request.user)
+    
+    # filter for read and unread
+    only_read = request.GET.get("only_read", False)
+    only_unread = request.GET.get("only_unread", False)
+    if only_read:
+        thread_list = thread_list.exclude(read_at=None)
+    elif only_unread:
+        thread_list = thread_list.filter(read_at=None)
+        
     return render_to_response(template_name, {
         'thread_list': thread_list,
+        'only_read': only_read,
+        'only_unread': only_unread,
     }, context_instance=RequestContext(request))
 
 @login_required
@@ -69,9 +80,9 @@ def compose(request, recipient=None, form_class=ComposeForm,
     """
     if request.method == "POST":
         sender = request.user
-        form = form_class(data=request.POST, sender=request.user, recipient_filter=recipient_filter)
+        form = form_class(data=request.POST, recipient_filter=recipient_filter)
         if form.is_valid():
-            form.save()
+            form.save(sender=request.user)
             request.user.message_set.create(
                 message=_(u"Message successfully sent."))
             if success_url is None:
@@ -80,7 +91,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
                 success_url = request.GET['next']
             return HttpResponseRedirect(success_url)
     else:
-        form = form_class(sender=request.user)
+        form = form_class()
         if recipient is not None:
             recipients = [u for u in User.objects.filter(username__in=[r.strip() for r in recipient.split('+')])]
             form.fields['recipient'].initial = recipients
@@ -171,7 +182,8 @@ def view(request, thread_id, form_class=ReplyForm,
     now = datetime.datetime.now()
     participant = get_object_or_404(Participant, thread=thread, user=request.user)
     message_list = []
-    for message in thread.all_msgs.all():
+    # in this view we want the last message last
+    for message in thread.all_msgs.all().order_by("sent_at"):
         unread = True
         if participant.read_at and message.sent_at <= participant.read_at:
             unread = False
@@ -182,4 +194,45 @@ def view(request, thread_id, form_class=ReplyForm,
         'thread': thread,
         'message_list': message_list,
         'form': form,
+        'participant': participant,
     }, context_instance=RequestContext(request))
+
+
+@login_required
+def batch_update(request, success_url=None):
+    """
+    Gets an array of message ids which can be either deleted or marked as
+    read/unread
+    """
+    if request.method == "POST":
+        ids = request.POST.getlist("batchupdateids")
+        if ids:
+            threads = Thread.objects.filter(pk__in=ids)
+            for thread in threads:
+                participant = thread.participants.filter(user=request.user)
+                if participant:
+                    participant = participant[0]
+                    if request.POST.get("action") == "read":
+                        participant.read_at = datetime.datetime.now()
+                    elif request.POST.get("action") == "delete":
+                        participant.deleted_at = datetime.datetime.now()
+                    elif request.POST.get("action") == "unread":
+                        participant.read_at = None
+                    participant.save()
+        else:
+            raise Http404
+        
+    else:
+        # this should only happen when hacked or developer uses wrong, therefore
+        # return simple message
+        return HttpResponse("Only Post allowed", code=400)
+        
+    if success_url:
+        return HttpResponseRedirect(success_url)
+    else:
+        # either go to last page, or to inbox as fallback
+        referer = request.META.get('HTTP_REFERER', None)
+        if referer:
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse("messages_inbox"))
