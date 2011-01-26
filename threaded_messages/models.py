@@ -41,6 +41,7 @@ class MessageManager(models.Manager):
             deleted_at__isnull=False,
         )
 
+
 class Message(models.Model):
     """
     A private message from user to user
@@ -63,6 +64,7 @@ class Message(models.Model):
         verbose_name = _("Message")
         verbose_name_plural = _("Messages")
 
+
 class Thread(models.Model):
     """
     A linear conversation between two or more Users
@@ -82,6 +84,7 @@ class Thread(models.Model):
         ordering = ['latest_msg']
         verbose_name = _("Thread")
         verbose_name_plural = _("Threads")
+    
     
 class Participant(models.Model):
     """

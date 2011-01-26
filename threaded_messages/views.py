@@ -39,6 +39,19 @@ def inbox(request, template_name='django_messages/inbox.html'):
     }, context_instance=RequestContext(request))
 
 @login_required
+def search(request, template_name="django_messages/search.html"):
+    from haystack.query import SearchQuerySet #include here, so the dependency is only needed when used
+    search_term = request.GET.get("q")
+    results = SearchQuerySet().filter(content=search_term,
+                                    participants=request.user.pk).models(Thread)
+                    # leads to error in haystack: .order_by("-last_message")
+    return render_to_response(template_name, {
+                                  "thread_results": results,
+                                  "search_term": search_term,
+                                }, context_instance=RequestContext(request))
+    
+    
+@login_required
 def outbox(request, template_name='django_messages/inbox.html'):
     """
     Displays a list of sent messages by the current user.

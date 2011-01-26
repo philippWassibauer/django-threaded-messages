@@ -5,6 +5,7 @@ from threaded_messages.views import *
 
 urlpatterns = patterns('',
     url(r'^$', redirect_to, {'url': 'inbox/'}),
+    url(r'^search/$', search, name='messages_search'),
     url(r'^inbox/$', inbox, name='messages_inbox'),
     url(r'^outbox/$', outbox, name='messages_outbox'),
     url(r'^compose/$', compose, name='messages_compose'),
