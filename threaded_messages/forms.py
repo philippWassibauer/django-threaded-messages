@@ -8,6 +8,10 @@ from django.contrib.auth.models import User
 from threaded_messages.models import *
 from threaded_messages.fields import CommaSeparatedUserField
 
+notification = None
+if "notification" in settings.INSTALLED_APPS:
+    from notification import models as notification
+    
 class ComposeForm(forms.Form):
     """
     A simple default form for private messages.
@@ -41,6 +45,12 @@ class ComposeForm(forms.Form):
         (sender_part, created) = Participant.objects.get_or_create(thread=thread, user=sender)
         sender_part.replied_at = sender_part.read_at = datetime.datetime.now()
         sender_part.save()
+        
+        #send notifications
+        if notification:
+            notification.send(recipients, "received_email",
+                                        {"thread": thread,
+                                         "message": new_message})
         
         return thread
 
