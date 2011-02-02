@@ -52,7 +52,7 @@ class ComposeForm(forms.Form):
                                         {"thread": thread,
                                          "message": new_message})
         
-        return thread
+        return (thread, new_message)
 
 
 class ReplyForm(forms.Form):
@@ -80,4 +80,4 @@ class ReplyForm(forms.Form):
         sender_part.replied_at = sender_part.read_at = datetime.datetime.now()
         sender_part.save()
         
-        return thread
+        return (thread, new_message)
