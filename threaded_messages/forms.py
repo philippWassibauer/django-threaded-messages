@@ -48,9 +48,9 @@ class ComposeForm(forms.Form):
         
         #send notifications
         if notification:
-            notification.send(recipients, "received_email",
+            notification.send(recipients, "received_email", 
                                         {"thread": thread,
-                                         "message": new_message})
+                                         "message": new_message}, sender=sender)
         
         return (thread, new_message)
 
@@ -72,12 +72,19 @@ class ReplyForm(forms.Form):
         thread.save()
         new_message.save()
         
+        recipients = []
         for participant in thread.participants.all():
             participant.deleted_at = None
             participant.save()
+            recipients.append(participant.user)
         
         sender_part = Participant.objects.get(thread=thread, user=sender)
         sender_part.replied_at = sender_part.read_at = datetime.datetime.now()
         sender_part.save()
         
+        if notification:
+            notification.send(recipients, "received_email", 
+                                        {"thread": thread,
+                                         "message": new_message}, sender=sender)
+            
         return (thread, new_message)
