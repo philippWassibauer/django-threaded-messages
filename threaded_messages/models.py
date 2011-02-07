@@ -6,19 +6,31 @@ from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from profiles.models import Profile
-
+from django.db.models import F, Q
 
 class MessageManager(models.Manager):
     
-    def inbox_for(self, user):
+    def inbox_for(self, user, read=None):
         """
         Returns all messages that were received by the given user and are not
         marked as deleted.
         """
-        return self.filter(
+        inbox = self.filter(
             user=user,
             deleted_at__isnull=True,
         )
+        
+        if read != None:
+            if read == True:
+                # read messages have read_at set to a later value then last message of the thread
+                inbox = inbox.exclude(read_at__isnull=True)\
+                            .filter(read_at__gt=F("thread__latest_msg__sent_at"))
+            else:
+                # unread threads are the ones that either have not been read at all or before the last message arrived
+                inbox = inbox.filter(Q(read_at__isnull=True)
+                                    |Q(read_at__lt=F("thread__latest_msg__sent_at")))
+                                     
+        return inbox
     
     def outbox_for(self, user):
         """

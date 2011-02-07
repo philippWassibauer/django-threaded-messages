@@ -22,21 +22,23 @@ def inbox(request, template_name='django_messages/inbox.html'):
     Optional Arguments:
         ``template_name``: name of the template to use.
     """
-    thread_list = Participant.objects.inbox_for(request.user)
-    
-    # filter for read and unread
     only_read = request.GET.get("only_read", False)
     only_unread = request.GET.get("only_unread", False)
+    
+    read = None
     if only_read:
-        thread_list = thread_list.exclude(read_at=None)
+        read = True
     elif only_unread:
-        thread_list = thread_list.filter(read_at=None)
+        read = False
+        
+    thread_list = Participant.objects.inbox_for(request.user, read=read)
         
     return render_to_response(template_name, {
         'thread_list': thread_list,
         'only_read': only_read,
         'only_unread': only_unread,
     }, context_instance=RequestContext(request))
+
 
 @login_required
 def search(request, template_name="django_messages/search.html"):
