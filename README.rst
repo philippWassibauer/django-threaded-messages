@@ -5,10 +5,10 @@ Django-Threaded-Messages
 This app is very similar to the Messaging System on Facebook. 
 
 Features:
-* Each Message is a thread with participants and messages
-* Inbox with filter for read and unread messages
-* Outbox
-* Fulltext search support using Haystack
+- Each Message is a thread with participants and messages
+- Inbox with filter for read and unread messages
+- Outbox
+- Fulltext search support using Haystack
 * Users are notified using django-notification when new messages arrive
 * Batch update to set messages to read/unread/delete
 * Ajax posting of messages within thread
