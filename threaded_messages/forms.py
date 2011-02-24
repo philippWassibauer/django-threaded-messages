@@ -76,7 +76,8 @@ class ReplyForm(forms.Form):
         for participant in thread.participants.all():
             participant.deleted_at = None
             participant.save()
-            recipients.append(participant.user)
+            if sender != participant.user: # dont send emails to the sender!
+                recipients.append(participant.user)
         
         sender_part = Participant.objects.get(thread=thread, user=sender)
         sender_part.replied_at = sender_part.read_at = datetime.datetime.now()
