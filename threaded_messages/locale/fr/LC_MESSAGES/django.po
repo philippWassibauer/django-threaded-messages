@@ -1,0 +1,132 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-22 11:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: fields.py:56
+#, python-format
+msgid "The following usernames are incorrect: %(users)s"
+msgstr ""
+
+#: forms.py:19
+msgid "Recipient"
+msgstr ""
+
+#: forms.py:20 models.py:84
+msgid "Subject"
+msgstr ""
+
+#: forms.py:21
+msgid "Body"
+msgstr ""
+
+#: forms.py:62
+msgid "Reply"
+msgstr ""
+
+#: management.py:8
+msgid "Received a Message"
+msgstr ""
+
+#: management.py:8
+msgid "Someone has sent you a message"
+msgstr ""
+
+#: models.py:61
+msgid "body"
+msgstr ""
+
+#: models.py:62
+msgid "sender"
+msgstr ""
+
+#: models.py:63
+msgid "parent message"
+msgstr ""
+
+#: models.py:64
+msgid "sent at"
+msgstr ""
+
+#: models.py:76
+msgid "Message"
+msgstr ""
+
+#: models.py:77 models.py:86
+msgid "Messages"
+msgstr ""
+
+#: models.py:85
+msgid "Latest message"
+msgstr ""
+
+#: models.py:97
+msgid "Thread"
+msgstr ""
+
+#: models.py:98
+msgid "Threads"
+msgstr ""
+
+#: models.py:105
+msgid "message thread"
+msgstr ""
+
+#: models.py:106
+msgid "participant users"
+msgstr ""
+
+#: models.py:107
+msgid "read at"
+msgstr ""
+
+#: models.py:108
+msgid "replied at"
+msgstr ""
+
+#: models.py:109
+msgid "deleted at"
+msgstr ""
+
+#: models.py:134
+msgid "participant"
+msgstr ""
+
+#: models.py:135
+msgid "participants"
+msgstr ""
+
+#: utils.py:20
+#, python-format
+msgid "New Message: %(subject)s"
+msgstr ""
+
+#: views.py:102
+msgid "Message successfully sent."
+msgstr ""
+
+#: views.py:143
+msgid "Conversation successfully deleted."
+msgstr ""
+
+#: views.py:164
+msgid "Conversation successfully recovered."
+msgstr ""
+
+#: views.py:190
+msgid "Reply successfully sent."
+msgstr ""

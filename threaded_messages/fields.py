@@ -19,6 +19,7 @@ class CommaSeparatedUserInput(widgets.Input):
             value = (', '.join([user.username for user in value]))
         return super(CommaSeparatedUserInput, self).render(name, value, attrs)
 
+
 class CommaSeparatedUserField(forms.Field):
     widget = CommaSeparatedUserInput
     
