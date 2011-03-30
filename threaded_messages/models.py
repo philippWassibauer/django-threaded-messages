@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from profiles.models import Profile
 from django.db.models import F, Q
-
+from django.db.models import Avg, Max, Min, Count
+    
 class MessageManager(models.Manager):
     
     def inbox_for(self, user, read=None):
@@ -20,6 +21,9 @@ class MessageManager(models.Manager):
             deleted_at__isnull=True,
         )
         
+        #import pdb; pdb.set_trace()
+        inbox = inbox.exclude(Q(thread__creator=user)&Q(thread__replied=False))
+            
         if read != None:
             if read == True:
                 # read messages have read_at set to a later value then last message of the thread
@@ -84,7 +88,10 @@ class Thread(models.Model):
     subject = models.CharField(_("Subject"), max_length=120)
     latest_msg = models.ForeignKey(Message, related_name='thread_latest', verbose_name=_("Latest message"))
     all_msgs = models.ManyToManyField(Message, related_name='thread', verbose_name=_("Messages"))
-
+    # the following fields are used to filter out messages that have not been replied to in the inbox
+    creator = models.ForeignKey(User, related_name='created_threads', verbose_name=_("creator"))
+    replied = models.BooleanField(editable=False, default=False)
+    
     def __unicode__(self):
         return self.subject
     

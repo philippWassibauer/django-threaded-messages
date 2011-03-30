@@ -35,7 +35,8 @@ class ComposeForm(forms.Form):
         new_message = Message.objects.create(body=body, sender=sender)
         
         thread = Thread.objects.create(subject=subject,
-                                       latest_msg=new_message)
+                                       latest_msg=new_message,
+                                       creator=sender)
         thread.all_msgs.add(new_message)
         thread.save()
 
@@ -69,6 +70,7 @@ class ReplyForm(forms.Form):
         new_message.parent_msg = thread.latest_msg
         thread.latest_msg = new_message
         thread.all_msgs.add(new_message)
+        thread.replied = True
         thread.save()
         new_message.save()
         
