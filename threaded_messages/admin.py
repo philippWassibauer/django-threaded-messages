@@ -6,6 +6,10 @@ from django.contrib.auth.models import User, Group
 
 from threaded_messages.models import *
 
-admin.site.register(Message)
+
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('sender', 'sent_at','body')
+    
+admin.site.register(Message, MessageAdmin)
 admin.site.register(Thread)
 admin.site.register(Participant)
