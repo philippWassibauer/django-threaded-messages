@@ -21,7 +21,7 @@ class MessageManager(models.Manager):
             deleted_at__isnull=True,
         )
         
-        #import pdb; pdb.set_trace()
+        # this makes sure that a just created message does not show up in inbox of the same user
         inbox = inbox.exclude(Q(thread__creator=user)&Q(thread__replied=False))
             
         if read != None:
@@ -32,7 +32,7 @@ class MessageManager(models.Manager):
             else:
                 # unread threads are the ones that either have not been read at all or before the last message arrived
                 inbox = inbox.filter(Q(read_at__isnull=True)
-                                    |Q(read_at__lte=F("thread__latest_msg__sent_at")))
+                                    |Q(read_at__lt=F("thread__latest_msg__sent_at")))
                                      
         return inbox
     
