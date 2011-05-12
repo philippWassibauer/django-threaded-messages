@@ -119,9 +119,9 @@ class Participant(models.Model):
     
     def new(self):
         """returns whether the recipient has read the message or not"""
-        if self.read_at is not None and self.read_at > self.thread.latest_msg.sent_at:
-            return False
-        return True
+        if self.read_at is None or self.read_at < self.thread.latest_msg.sent_at:
+            return True
+        return False
 
     def replied(self):
         """returns whether the recipient has replied the message or not"""
