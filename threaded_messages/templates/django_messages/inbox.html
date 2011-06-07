@@ -1,0 +1,77 @@
+{% extends "django_messages/base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% block body %}
+    {% autopaginate thread_list 10 %}
+    <div class="">
+      <div style="clear:both;"></div>
+      <div class="inbox-bar">
+        <h2 class="grid_6">
+          {% trans "Inbox"|upper %}
+        </h2>
+        <div class="prefix_0 grid_6">
+          <form action="{% url messages_search %}" method="GET" style="float: right">
+            <label class="inline" for="q">{% if keywords %}{{ keywords }}{% else %}{% trans 'Search Messages' %}{% endif %}</label>
+            <input type="text" title="{% trans 'Search Messages' %}" id="q" name="q" class="message-search forum-search" />
+          </form>
+          <a href="{% url modal_messages_compose %}" style="float: right" class="small-green-button" rel='facebox'>
+             {% trans "Create message" %}
+          </a>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+    </div>
+    <form action="{% url messages_batch_update %}" method="post">
+        {% csrf_token %}
+        <div class="inbox-action-box">
+              <div style="float: left; margin-top: 7px;">
+                  {% trans "show" %}:
+                  {% if only_unread or only_read %}<a href="{% url messages_inbox %}">{% trans "all" %}</a>{% else %}{% trans "all" %}{% endif %} ·
+                  {% if not only_read %}<a href="{% url messages_inbox %}?only_read=1">{% trans "read" %}</a>{% else %}{% trans "read" %}{% endif %} ·
+                  {% if not only_unread %}<a href="{% url messages_inbox %}?only_unread=1">{% trans "unread" %}</a>{% else %}{% trans "unread" %}{% endif %}
+              </div>
+              <div style="float: right">
+                  <button type="submit" name="action" value="read" class="small-green-button">{% trans "mark as read" %}</button>
+                  <button type="submit" name="action" value="delete" class="small-green-button">{% trans "delete messages" %}</button>
+              </div>
+             <div style="clear:both;"></div>
+        </div>
+        <div style="clear: both;"></div>
+        <div class="inbox">
+            <div class="message message-header">
+              <div class="sender grid_5"><h3>{% trans "Sender" %}</h3></div>
+              <div class="avatar grid_1"></div>
+              <div class="subject grid_6"><h3>{% trans "Subject" %}</h3></div>
+            </div>
+            <div style="clear: both;"></div>
+
+            {% for message in thread_list %}
+              <div class="message {% if message.new %}unread{% endif %}">
+                  <div class="avatar grid_1">
+                    <a href="{{ message.thread.latest_msg.sender.get_absolute_url }}">{% avatar message.thread.latest_msg.sender 30 %}</a>
+                  </div>
+                  <div class="sender grid_4">
+                    <a href="{{ message.thread.latest_msg.sender.get_absolute_url }}">{{ message.thread.latest_msg.sender }}</a>
+                    <span class="date">{{ message.thread.latest_msg.sent_at|date:_("DATETIME_FORMAT") }}</span>
+                  </div>
+                  <div class="subject grid_6">
+                    <a href="{{message.thread.get_absolute_url }}">{% if message.new %}<b>{% endif %}{{ message.thread.subject|truncchar:45 }}{% if message.new %}</b>{% endif %}</a>
+                    <span class="message-tease">{{message.thread.latest_msg.body|truncatewords:8}}</span>
+                  </div>
+
+                  <div class="checkbox grid_1">
+                    <input name="batchupdateids" type="checkbox" value="{{message.thread.pk}}" />
+                  </div>
+                  {% if message.replied %}{% endif %}
+                  {% if message.new %}{% endif %}
+                  <div style="clear: both;"></div>
+              </div>
+            {% empty %}
+                <div class="message unread">
+                    <b class="no-message">{% trans "No messages" %}</b>
+                </div>
+            {% endfor %}
+        </div>
+    </form>
+    <div class="messages-footer">{% paginate %}</div>
+{% endblock %}

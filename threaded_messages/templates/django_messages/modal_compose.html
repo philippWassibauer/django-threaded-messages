@@ -1,0 +1,76 @@
+{% load i18n %}
+{% load uni_form_tags %}
+{% load field_value %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/token-input.css" type="text/css" />
+<form id="message-modal-form" 
+      action="{% url messages_compose %}" method="post"
+      class="uniForm modal-message-form grey-form">
+    {% csrf_token %}
+    <fieldset class="inlineLabels">
+        <input type="hidden" name="attachment_id" id="attachment_id" />
+        {{ form|as_uni_form }}
+    </fieldset>
+    <div class="button-bar">
+      <button type="submit" class="small-green-button" onclick="$.facebox.close()">{% trans "Cancel" %}</button>
+  
+      <button id="modal-send-button" class="small-green-button" type="submit" onclick="$('#message-modal-form').submit()">
+          {% trans "Send" %}
+      </button>
+    </div>
+</form>
+
+<!-- remove if you have these dependencies are already satisfied in your app -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var recipient =  $("#id_recipient").val();
+        $("#id_recipient").val("")
+
+        var parameters = {
+            classes: {
+                tokenList: "token-input-list-gidsy",
+                token: "token-input-token-gidsy",
+                tokenDelete: "token-input-delete-token-gidsy",
+                selectedToken: "token-input-selected-token-gidsy",
+                highlightedToken: "token-input-highlighted-token-gidsy",
+                dropdown: "token-input-dropdown-gidsy",
+                dropdownItem: "token-input-dropdown-item-gidsy",
+                dropdownItem2: "token-input-dropdown-item2-gidsy",
+                selectedDropdownItem: "token-input-selected-dropdown-item-gidsy",
+                inputToken: "token-input-input-token-gidsy"
+            },
+
+            hintText: "{% trans "Type in a search term" %}",
+            noResultsText: "{% trans "No results" %}",
+            searchingText: "{% trans "Searching" %}...",
+            queryParam: "term",
+        };
+
+        if(recipient){
+            parameters["prePopulate"] = [{id:recipient, name:"{{ form.recipient.first_name }} {{ form.recipient.last_name }}"}]
+        }
+
+        $("#id_recipient").tokenInput("{% url recipient_search %}?format=json", parameters);
+        
+        $('#message-modal-form').ajaxForm({
+            //target: "target",
+            beforeSubmit: function (){
+                $('#message-modal-form').addClass("ajax-form-disabled")
+            },
+            success: function(){
+                $('#message-modal-form').removeClass("ajax-form-disabled")
+                $('#message-modal-form').html("<div id='message'></div>");
+                $('#message-modal-form #message').html("<h2>{% trans "Message sent" %}!</h2>")
+                .append("<p></p>")
+                .hide()
+                .fadeIn(2500, function() {
+                    // hide facebox
+                    $(document).trigger('close.facebox');
+                });
+            },
+        })
+        $("#id_recipient").focus()
+
+    });
+</script>

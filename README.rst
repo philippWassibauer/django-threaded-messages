@@ -2,7 +2,9 @@
 Django-Threaded-Messages
 ===================
 
-This app is very similar to the Messaging System on Facebook. 
+This app is very similar to the Messaging System on Facebook.
+
+There are tests, but they are from the project I forked it from. I will update and improve them once I get around to it.
 
 Features
 ============
@@ -14,7 +16,8 @@ Features
 * Batch update to set messages to read/unread/delete
 * Ajax posting of messages within thread
 * Can be used with jquery.tokeninput to offer a similar usuability as Facebook when it comes to selecting recipients.
-* Installable using pip and easy_install 
+* Installable using pip and easy_install
+* Modular message sending using facebox
 
 Dependencies
 ============

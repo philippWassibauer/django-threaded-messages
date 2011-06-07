@@ -1,0 +1,21 @@
+<div class="message">
+    <div class="avatar">
+        <a href="{{ message.sender.get_absolute_url }}">
+            {% avatar message.sender 50 %}
+        </a>
+    </div>
+    <div class="message-body">
+        <h4><a href="{{ message.sender.get_absolute_url }}">{{ message.sender }}</a></h4>
+        {{ message.body|linebreaksbr }}
+    </div>
+    <div class="extra-info">
+        <div class="date">{{ message.sent_at|date:_("DATETIME_FORMAT")}}</div>
+        {% ifnotequal message.sender request.user %}
+            <div>
+                 
+            </div>
+        {% endifnotequal %}
+    </div>
+    <div style="clear: both"></div>
+</div>
+

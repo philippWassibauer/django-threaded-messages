@@ -1,0 +1,77 @@
+{% extends "django_messages/base.html" %}
+{% load i18n %}
+{% load truncchar_tag %}
+{% load pagination_tags %}
+{% block body %}
+    <!--{_% autopaginate thread_results 10 %}-->
+    <div class="page-header-wrapper">
+        <h2 class="page-header">
+            <img class="page-header-icon" src="{{ STATIC_URL }}img/icons/18/message.png"/>
+            {% trans "Inbox"|upper %}
+        </h2>
+        <span class="sub-page-header">{% trans "All messages" %}</span>
+        <div style="clear:both;"></div>
+        <div class="inbox-bar">
+            <div class="page-search">
+                <form action="{% url messages_search %}" method="GET">
+                    <input name="q" type="text" {% if not search_term %}title="{% trans 'Search Messages' %}"{% endif %}
+                           value="{{ search_term }}" />
+                    <button type="submit" class="lupe-on-white"></button>
+                    
+                </form>
+            </div>
+            <a href="{% url modal_messages_compose %}" class="green-button" rel='facebox'>
+                 <img src="{{ STATIC_URL }}img/icons/18/add_message.png"/> {% trans "Create message" %}
+            </a>
+            <div class="message-pagination">{% paginate %}</div>
+            <div style="clear: both;"></div>
+        </div>
+    </div>
+    <form action="{% url messages_batch_update %}" method="post">
+        <h3>{% trans "Searching for" %}: {{ search_term }}</h3>
+        {% csrf_token %}
+        <div style="clear: both;"></div>
+        <div class="inbox">
+            <div class="message message-header">
+                <div class="sender"><h3>{% trans "Sender" %}</h3></div>
+                <div class="avatar"></div>
+                <div class="subject"><h3>{% trans "Subject" %}</h3></div>
+            </div>
+            <div style="clear: both;"></div>
+            {% for thread in thread_results %}
+                {% with thread.object as thread %}
+                    <div class="message">
+                        <div class="avatar">
+                            <a href="{{ thread.latest_msg.sender.get_absolute_url }}">
+                            {% avatar thread.latest_msg.sender 30 %}</a>
+                        </div>
+                        <div class="sender">
+                            <a href="{{ thread.latest_msg.sender.get_absolute_url }}">
+                                {{ thread.latest_msg.sender }}</a>
+                            <span class="date">{{ thread.latest_msg.sent_at|date:_("DATETIME_FORMAT") }}</span>
+                        </div>
+                        <div class="subject">
+                            <a href="{{thread.get_absolute_url }}">{{ thread.subject|truncchar:45 }}</a>
+                            <span class="message-tease">{{thread.latest_msg.body|truncatewords:8}}</span>
+                        </div>
+
+                        <div class="checkbox"><input name="batchupdateids" type="checkbox" value="{{thread.pk}}" /></div>
+                        
+                        <div style="clear: both;"></div>
+                    </div>
+                {% endwith %}
+            {% empty %}
+                <div class="message unread">
+                    <b class="no-message">{% trans "No messages" %}</b>
+                </div>
+            {% endfor %}
+        </div>
+    </form>
+    <div class="messages-footer"><div class="message-pagination">{% paginate %}</div></div>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("body").highlight("{{ search_term }}", { element: 'span', className: 'highlighted'});
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "django_messages/base.html" %}
+
+{% load i18n %}
+{% load uni_form_tags %}
+
+
+{% block css_block %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/token-input.css" type="text/css" />
+{% endblock %}
+
+{% block body %}
+    <h1>{% trans "Compose Message"|upper %}</h1>
+    
+    <form action="" method="post" class="uniForm">
+        {% csrf_token %}
+        <fieldset class="inlineLabels">
+            {{ form|as_uni_form }}
+            <div class="form_block">
+                <input class="green-button" type="submit" value="{% trans "Send" %} &raquo;"/>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+
+{% block extra_body %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.tokeninput.js"></script>
+    
+    <script type="text/javascript">
+        $().ready(function() {
+            var recipient =  $("#id_recipient").val();
+            $("#id_recipient").val("")
+            $("#id_recipient").tokenInput("{% url recipient_search %}?format=json", {
+                classes: {
+                    tokenList: "token-input-list-facebook",
+                    token: "token-input-token-facebook",
+                    tokenDelete: "token-input-delete-token-facebook",
+                    selectedToken: "token-input-selected-token-facebook",
+                    highlightedToken: "token-input-highlighted-token-facebook",
+                    dropdown: "token-input-dropdown-facebook",
+                    dropdownItem: "token-input-dropdown-item-facebook",
+                    dropdownItem2: "token-input-dropdown-item2-facebook",
+                    selectedDropdownItem: "token-input-selected-dropdown-item-facebook",
+                    inputToken: "token-input-input-token-facebook"
+                },
+                {% if recipient %}
+                prePopulate: [{id:recipient, name:recipient}],
+                {% endif %}
+                hintText: "{% trans "Type in a search term" %}",
+                noResultsText: "{% trans "No results" %}",
+                searchingText: "{% trans "Searching" %}...",
+                queryParam: "term",
+            });
+             /*
+            $( "#id_recipient" ).autocomplete({
+                minLength: 2,
+                source: "{% url recipient_search %}?format=json",
+                focus: function( event, ui ) {
+                    return false;
+                },
+                select: function( event, ui ) {
+                    $("#id_recipient").val(ui.item.username)
+                }
+            })
+            .data( "autocomplete" )._renderItem = function( ul, item ) {
+                return $( "<li></li>" )
+                    .data( "item.autocomplete", item )
+                    .append( "<a href='"+ item.url +"'>"+
+                            "<div class='icon'><img src='"+item.img+"' width='50px' height='50px' /></div>" +
+                            "<div class='description'>"+item.name + "</div><div style='clear: both;'></div></a>" )
+                    .appendTo( ul );
+            };   */
+               
+            $("#id_recipient").focus()
+        });
+    </script>
+{% endblock %}
