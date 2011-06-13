@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import datetime
-
+from django.contrib.auth import load_backend, login, BACKEND_SESSION_KEY
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -9,10 +9,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.conf import settings
-
+from django.template.loader import render_to_string
+from avatar.templatetags.avatar_tags import avatar_url
 from threaded_messages.models import *
 from threaded_messages.forms import ComposeForm, ReplyForm
+import simplejson
+from threaded_messages.models import Thread
 
 
 @login_required
