@@ -31,12 +31,23 @@ $("#id_recipient").tokenInput("{% url recipient_search %}?format=json", paramete
 to point to your custom view.
 
                             
-                            
-
 Dependencies
 ============
 * Haystack
 * Django-notification
+
+
+Install
+============
+pip install -e http://github.com/philippWassibauer/django-threaded-messages.git#egg=threaded-messages
+
+or
+
+pip install django-threaded-messages
+
+
+Similar Projects
+============
 
 There are two other repositories doing this (one of them is not maintained anymore):
 
