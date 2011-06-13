@@ -22,6 +22,7 @@
 <!-- remove if you have these dependencies are already satisfied in your app -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.tokeninput.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         var recipient =  $("#id_recipient").val();
@@ -29,16 +30,16 @@
 
         var parameters = {
             classes: {
-                tokenList: "token-input-list-gidsy",
-                token: "token-input-token-gidsy",
-                tokenDelete: "token-input-delete-token-gidsy",
-                selectedToken: "token-input-selected-token-gidsy",
-                highlightedToken: "token-input-highlighted-token-gidsy",
-                dropdown: "token-input-dropdown-gidsy",
-                dropdownItem: "token-input-dropdown-item-gidsy",
-                dropdownItem2: "token-input-dropdown-item2-gidsy",
-                selectedDropdownItem: "token-input-selected-dropdown-item-gidsy",
-                inputToken: "token-input-input-token-gidsy"
+                tokenList: "token-input-list",
+                token: "token-input-token",
+                tokenDelete: "token-input-delete-token",
+                selectedToken: "token-input-selected-token",
+                highlightedToken: "token-input-highlighted-token",
+                dropdown: "token-input-dropdown",
+                dropdownItem: "token-input-dropdown-item",
+                dropdownItem2: "token-input-dropdown-item2",
+                selectedDropdownItem: "token-input-selected-dropdown-item",
+                inputToken: "token-input-input-token"
             },
 
             hintText: "{% trans "Type in a search term" %}",
