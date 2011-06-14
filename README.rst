@@ -56,4 +56,11 @@ https://github.com/typeish/django-threaded-messages
 I am not sure what the exact differences are to this implementation. I am pretty certain that they don't include read/unread, fulltext search, pip install etc.
 
 
+ Follow Me
+============
+http://github.com/philippWassibauer
+http://twitter.com/scalar
+http://philippw.tumblr.com
+https://bitbucket.org/philippwassibauer
+
 
