@@ -3,7 +3,6 @@ Django-Threaded-Messages
 ===============
 
 This app is very similar to the Messaging System on Facebook.
-
 There are tests, but they are from the project I forked it from. I will update and improve them once I get around to it.
 
 Features
@@ -55,7 +54,7 @@ https://github.com/typeish/django-threaded-messages
 I am not sure what the exact differences are to this implementation. I am pretty certain that they don't include read/unread, fulltext search, pip install etc.
 
 
- Follow Me
+Follow Me
 ===============
 http://github.com/philippWassibauer
 http://twitter.com/scalar
