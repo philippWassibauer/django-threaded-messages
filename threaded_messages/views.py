@@ -28,6 +28,7 @@ def inbox(request, template_name='django_messages/inbox.html'):
     """
     only_read = request.GET.get("only_read", False)
     only_unread = request.GET.get("only_unread", False)
+    only_unreplied = request.GET.get("only_unreplied", None)
     
     read = None
     if only_read:
@@ -35,12 +36,13 @@ def inbox(request, template_name='django_messages/inbox.html'):
     elif only_unread:
         read = False
         
-    thread_list = Participant.objects.inbox_for(request.user, read=read)
+    thread_list = Participant.objects.inbox_for(request.user, read=read, only_unreplied=only_unreplied)
         
     return render_to_response(template_name, {
         'thread_list': thread_list,
         'only_read': only_read,
         'only_unread': only_unread,
+        'only_unreplied': only_unreplied,
     }, context_instance=RequestContext(request))
 
 

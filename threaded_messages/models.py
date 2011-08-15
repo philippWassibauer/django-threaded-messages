@@ -11,7 +11,7 @@ from django.db.models import Avg, Max, Min, Count
     
 class MessageManager(models.Manager):
     
-    def inbox_for(self, user, read=None):
+    def inbox_for(self, user, read=None, only_unreplied=None):
         """
         Returns all messages that were received by the given user and are not
         marked as deleted.
@@ -33,7 +33,12 @@ class MessageManager(models.Manager):
                 # unread threads are the ones that either have not been read at all or before the last message arrived
                 inbox = inbox.filter(Q(read_at__isnull=True)
                                     |Q(read_at__lt=F("thread__latest_msg__sent_at")))
-                                     
+        
+        if unreplied != None:
+            if unreplied == True:
+                inbox = inbox.filter(Q(replied_at__isnull=True)
+                                    |Q(replied_at__lt=F("thread__latest_msg__sent_at")))
+                
         return inbox
     
     def outbox_for(self, user):
@@ -125,9 +130,10 @@ class Participant(models.Model):
 
     def replied(self):
         """returns whether the recipient has replied the message or not"""
-        if self.replied_at is not None:
-            return False
-        return True
+        if self.replied_at is None \
+            or self.replied_at < self.thread.latest_msg.sent_at:
+            return True
+        return False
     
     def others(self):
         """returns the other participants of the thread"""
