@@ -34,8 +34,8 @@ class MessageManager(models.Manager):
                 inbox = inbox.filter(Q(read_at__isnull=True)
                                     |Q(read_at__lt=F("thread__latest_msg__sent_at")))
         
-        if unreplied != None:
-            if unreplied == True:
+        if only_unreplied != None:
+            if only_unreplied == True:
                 inbox = inbox.filter(Q(replied_at__isnull=True)
                                     |Q(replied_at__lt=F("thread__latest_msg__sent_at")))
                 
