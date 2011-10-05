@@ -5,7 +5,6 @@ from django.db.models import signals
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-from profiles.models import Profile
 from django.db.models import F, Q
 from django.db.models import Avg, Max, Min, Count
     
@@ -135,6 +134,16 @@ class Participant(models.Model):
             return True
         return False
     
+    def last_other_sender(self):
+        """returns the last sender thats not the viewing user. if nobody
+            besides you sent a message to the thread we take a random one
+        """
+        sender = self.thread.all_msgs.exclude(user=self.user)
+        if sender:
+            return sender[0]
+        else:
+            return self.others()[0]
+        
     def others(self):
         """returns the other participants of the thread"""
         return self.thread.participants.exclude(user=self.user)
