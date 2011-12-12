@@ -379,7 +379,7 @@ $.fn.ajaxSubmit = function(options) {
 				else if (s.dataType == 'xml' && !xhr.responseXML && xhr.responseText != null) {
 					xhr.responseXML = toXml(xhr.responseText);
 				}
-				data = $.httpData(xhr, s.dataType);
+				data = xhr.responseText;
 			}
 			catch(e){
 				log('error caught:',e);

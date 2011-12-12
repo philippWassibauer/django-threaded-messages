@@ -17,6 +17,7 @@ from threaded_messages.models import *
 from threaded_messages.forms import ComposeForm, ReplyForm
 import simplejson
 from threaded_messages.models import Thread
+import logging
 
 
 @login_required
@@ -29,13 +30,16 @@ def inbox(request, template_name='django_messages/inbox.html'):
     only_read = request.GET.get("only_read", False)
     only_unread = request.GET.get("only_unread", False)
     only_unreplied = request.GET.get("only_unreplied", None)
-    
+
     read = None
     if only_read:
         read = True
     elif only_unread:
         read = False
-        
+
+    if only_unreplied:
+        only_unreplied = True
+
     thread_list = Participant.objects.inbox_for(request.user, read=read, only_unreplied=only_unreplied)
         
     return render_to_response(template_name, {
@@ -51,7 +55,8 @@ def search(request, template_name="django_messages/search.html"):
     from haystack.query import SearchQuerySet #include here, so the dependency is only needed when used
     search_term = request.GET.get("q")
     results = SearchQuerySet().filter(content=search_term,
-                                    participants=request.user.pk).models(Thread)
+                                    participants=request.user.pk)\
+                                    .order_by('-last_message').models(Thread)
                     # leads to error in haystack: .order_by("-last_message")
     return render_to_response(template_name, {
                                   "thread_results": results,
@@ -99,6 +104,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
         ``template_name``: the template to use
         ``success_url``: where to redirect after successfull submission
     """
+    recipients = []
     if request.method == "POST":
         sender = request.user
         form = form_class(data=request.POST, recipient_filter=recipient_filter)
@@ -118,6 +124,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
             form.fields['recipient'].initial = recipients
     return render_to_response(template_name, {
         'form': form,
+        'recipients': recipients,
     }, context_instance=RequestContext(request))
 
 
@@ -267,7 +274,12 @@ def message_ajax_reply(request, thread_id,
     if request.POST:
         form = ReplyForm(request.POST)
         if form.is_valid():
-            (thread, new_message) = form.save(sender=request.user, thread=thread)
+            try:
+                (thread, new_message) = form.save(sender=request.user, thread=thread)
+            except Exception, e:
+                logging.exception(e)
+                return HttpResponse(status=500, content="Message could not be sent")
+                
             return render_to_response(template_name,{
                 "message": new_message,
             }, context_instance=RequestContext(request))

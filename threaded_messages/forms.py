@@ -1,12 +1,16 @@
 import datetime
+import settings as sendgrid_settings
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.contrib.auth.models import User
+from models import *
+from fields import CommaSeparatedUserField
+from utils import reply_to_thread
 
-from threaded_messages.models import *
-from threaded_messages.fields import CommaSeparatedUserField
+if sendgrid_settings.THREADED_MESSAGES_USE_SENDGRID:
+    from sendgrid_parse_api.utils import create_reply_email
 
 notification = None
 if "notification" in settings.INSTALLED_APPS:
@@ -27,7 +31,7 @@ class ComposeForm(forms.Form):
         if recipient_filter is not None:
             self.fields['recipient']._recipient_filter = recipient_filter
     
-    def save(self, sender):
+    def save(self, sender, send=True):
         recipients = self.cleaned_data['recipient']
         subject = self.cleaned_data['subject']
         body = self.cleaned_data['body']
@@ -38,7 +42,6 @@ class ComposeForm(forms.Form):
                                        latest_msg=new_message,
                                        creator=sender)
         thread.all_msgs.add(new_message)
-        thread.save()
 
         for recipient in recipients:
             Participant.objects.create(thread=thread, user=recipient)
@@ -47,9 +50,19 @@ class ComposeForm(forms.Form):
         sender_part.replied_at = sender_part.read_at = datetime.datetime.now()
         sender_part.save()
         
+        thread.save() #save this last, since this updates the search index
+        
         #send notifications
-        if notification:
-            notification.send(recipients, "received_email", 
+        if send and notification:
+            if sendgrid_settings.THREADED_MESSAGES_USE_SENDGRID:
+                for r in recipients:
+                    reply_email = create_reply_email(sendgrid_settings.THREADED_MESSAGES_ID, r, thread)
+                    notification.send(recipients, "received_email", 
+                                        {"thread": thread,
+                                         "message": new_message}, sender=sender,
+                                        from_email=reply_email.get_reply_email())
+            else:
+                notification.send(recipients, "received_email", 
                                         {"thread": thread,
                                          "message": new_message}, sender=sender)
         
@@ -65,29 +78,4 @@ class ReplyForm(forms.Form):
     
     def save(self, sender, thread):
         body = self.cleaned_data['body']
-        
-        new_message = Message.objects.create(body=body, sender=sender)
-        new_message.parent_msg = thread.latest_msg
-        thread.latest_msg = new_message
-        thread.all_msgs.add(new_message)
-        thread.replied = True
-        thread.save()
-        new_message.save()
-        
-        recipients = []
-        for participant in thread.participants.all():
-            participant.deleted_at = None
-            participant.save()
-            if sender != participant.user: # dont send emails to the sender!
-                recipients.append(participant.user)
-        
-        sender_part = Participant.objects.get(thread=thread, user=sender)
-        sender_part.replied_at = sender_part.read_at = datetime.datetime.now()
-        sender_part.save()
-        
-        if notification:
-            notification.send(recipients, "received_email", 
-                                        {"thread": thread,
-                                         "message": new_message}, sender=sender)
-            
-        return (thread, new_message)
+        return reply_to_thread(thread, sender, body)

@@ -33,6 +33,9 @@ Dependencies
 ===============
 * Haystack
 * Django-notification
+* django-avatar
+* django-pagination
+* django-uni-form
 
 
 Install
