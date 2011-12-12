@@ -28,7 +28,17 @@ change the call in your compose templates::
 
 to point to your custom view.
 
-                            
+
+Sendgrid Parse Api Integration for email replies (beta)
+===============
+This feature is not finished yet. In the future it is possible to enable
+reply emails (if you are using Sendgrid as email service) using the following settings::
+    THREADED_MESSAGES_USE_SENDGRID = True
+    THREADED_MESSAGES_ID = "m"
+
+When a user replies online the recipient will get an email to which he can respond.
+
+
 Dependencies
 ===============
 * Haystack
@@ -36,7 +46,7 @@ Dependencies
 * django-avatar
 * django-pagination
 * django-uni-form
-
+* sendgrid-parse-api (released soon) - only if email replies should be activated
 
 Install
 ===============
